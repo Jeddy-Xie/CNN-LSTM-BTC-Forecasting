@@ -19,7 +19,8 @@ env/
 
 # Data files
 data/raw/
-data/processed/
+data/processed/*
+!data/processed/BTC-USD.csv
 *.csv
 *.pkl
 
