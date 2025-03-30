@@ -21,7 +21,6 @@ env/
 data/raw/
 data/processed/*
 !data/processed/BTC-USD.csv
-*.csv
 *.pkl
 
 # Model checkpoints
