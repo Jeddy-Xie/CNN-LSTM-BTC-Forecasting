@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.env
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Data files
+data/raw/
+data/processed/
+*.csv
+*.pkl
+
+# Model checkpoints
+models/*.pth
+models/*.pt
+models/*.ckpt
+
+# Results
+results/
+*.png
+*.jpg
+*.jpeg
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db 
