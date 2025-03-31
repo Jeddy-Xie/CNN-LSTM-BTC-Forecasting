@@ -9,7 +9,8 @@ bayesian-optimization==1.4.0
 matplotlib==3.8.2
 
 # Experiment tracking
-comet-ml==3.35.0
+comet_ml==3.35.0
 
 # Utilities
 python-dotenv==1.0.0
+
