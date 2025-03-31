@@ -18,7 +18,6 @@ env/
 *.code-workspace
 
 # Data files
-data/processed/
 *.csv
 *.pkl
 
