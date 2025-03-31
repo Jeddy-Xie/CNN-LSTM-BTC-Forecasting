@@ -34,8 +34,6 @@ experiment = Experiment(
 )
 
 experiment.log_other("device", device)
-experiment.set_git_metadata()
-experiment.log_environment()
 
 btc = data_load(os.path.join(data_dir, 'BTC-USD.csv'))
 
