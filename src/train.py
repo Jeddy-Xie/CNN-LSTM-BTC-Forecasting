@@ -65,7 +65,8 @@ def scale_data(data, scaler_type='minmax'):
         scaler = RobustScaler(with_centering=True, with_scaling=True, quantile_range=(25.0, 75.0))
     else:
         raise ValueError(f"Unsupported scaler type: {scaler_type}. Use 'minmax', 'standard', or 'robust'")
-    return scaler.fit_transform(data)
+    scaled_data = scaler.fit_transform(data)
+    return scaled_data, scaler
 
 # --- Create Time Series Tensors ---
 def create_time_series_tensors(data, sequence_length=10, target_index=5):
@@ -161,7 +162,7 @@ def objective(data, learning_rate, batch_size, num_epochs, hidden_dim, num_layer
     data_array = data[features].values
     
     # Scale the data
-    scaled_data = scale_data(data_array, scaler_type)
+    scaled_data, _ = scale_data(data_array, scaler_type)
     
     # Create sequences (time series) and corresponding targets.
     close_index = features.index('y')
