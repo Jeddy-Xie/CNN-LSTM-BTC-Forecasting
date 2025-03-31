@@ -1,3 +1,6 @@
+import comet_ml
+from comet_ml import Experiment
+
 import torch
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 #assert torch.cuda.is_available(), 'cuda is not available'
@@ -17,9 +20,6 @@ from src.train import *
 
 # Import Bayesian Optimization
 from bayes_opt import BayesianOptimization
-
-import comet_ml
-from comet_ml import Experiment
 
 # Load environment variables
 load_dotenv()
