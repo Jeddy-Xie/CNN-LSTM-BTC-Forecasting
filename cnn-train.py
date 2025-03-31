@@ -5,9 +5,11 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # Set up the data directory
 import os
+from dotenv import load_dotenv
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 print(current_dir)
-data_dir = os.path.join(current_dir, 'data', 'processed',)
+data_dir = os.path.join(current_dir, 'data', 'processed')
 
 # Import Handwritten Functions
 from src.models.cnn_lstm import CNNLSTM
@@ -15,6 +17,25 @@ from src.train import *
 
 # Import Bayesian Optimization
 from bayes_opt import BayesianOptimization
+
+import comet_ml
+from comet_ml import Experiment
+
+# Load environment variables
+load_dotenv()
+
+# Initialize Comet
+comet_api_key = os.getenv('COMET_API_KEY')
+comet_project_name = os.getenv('COMET_PROJECT_NAME')
+
+experiment = Experiment(
+    api_key=comet_api_key,
+    project_name=comet_project_name,
+)
+
+experiment.log_other("device", device)
+experiment.set_git_metadata()
+experiment.log_environment()
 
 btc = data_load(os.path.join(data_dir, 'BTC-USD.csv'))
 
@@ -34,8 +55,24 @@ pbounds = {
 # --- Set up Bayesian Optimization ---
 
 optimizer_bo = BayesianOptimization(
-    f=lambda learning_rate, batch_size, num_epochs, hidden_dim, num_layers, dropout, sequence_length, scaler_type_num:
-        objective(btc, learning_rate, batch_size, num_epochs, hidden_dim, num_layers, dropout, sequence_length, scaler_type_num),
+    f=lambda learning_rate, 
+                batch_size, 
+                num_epochs, 
+                hidden_dim, 
+                num_layers, 
+                dropout, 
+                sequence_length, 
+                scaler_type_num:
+        objective(btc,
+                   learning_rate,
+                     batch_size, 
+                     num_epochs, 
+                     hidden_dim, 
+                     num_layers, 
+                     dropout, 
+                     sequence_length, 
+                     scaler_type_num, 
+                     experiment),
     pbounds=pbounds,
     random_state=42,
 )
