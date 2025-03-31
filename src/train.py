@@ -9,6 +9,8 @@ import torch.nn as nn
 
 from src.models.cnn_lstm import CNNLSTM  
 
+from comet_ml import Experiment
+
 # --- Data Loading ---
 def data_load(filePath):
     """
@@ -129,42 +131,60 @@ def evaluate(model, test_loader, criterion=nn.L1Loss()):
     return -test_loss  # Negative loss for maximization
 
 # --- Objective Function for Bayesian Optimization ---
-def objective(data, learning_rate, batch_size, num_epochs, hidden_dim, num_layers, dropout, sequence_length, scaler_type_num):
+def objective(data, learning_rate, batch_size, num_epochs, hidden_dim, num_layers, dropout, sequence_length, scaler_type_num, experiment):
+    # Create a new Comet experiment for this iteration 
     # Convert hyperparameters to proper types
     batch_size = int(batch_size)
     num_epochs = int(num_epochs)
     num_layers = int(num_layers)
     sequence_length = int(sequence_length)
     
-    # Define features and extract as numpy array.
-    features = ['x1', 'x2', 'x3', 'x4', 'x5', 'y']
-    data_array = data[features].values
-
     # Map scaler_type_num (a continuous value) to a categorical scaler option.
     scaler_options = ['minmax', 'standard', 'robust']
     scaler_type = scaler_options[int(round(scaler_type_num))]
     
-    # Scale the data.
+    # Log hyperparameters to Comet
+    experiment.log_parameters({
+        "learning_rate": learning_rate,
+        "batch_size": batch_size,
+        "num_epochs": num_epochs,
+        "hidden_dim": int(hidden_dim),
+        "num_layers": num_layers,
+        "dropout": dropout,
+        "sequence_length": sequence_length,
+        "scaler_type": scaler_type,
+    })
+    
+    # Prepare the data
+    features = ['x1', 'x2', 'x3', 'x4', 'x5', 'y']
+    data_array = data[features].values
+    
+    # Scale the data
     scaled_data = scale_data(data_array, scaler_type)
     
-    # Our target is 'y'; get its index.
+    # Create sequences (time series) and corresponding targets.
     close_index = features.index('y')
-    
-    # Create sequences and targets.
     X_tensor, y_tensor = create_time_series_tensors(scaled_data, sequence_length, target_index=close_index)
     
-    # Train-test split (80/20).
+    # Train-test split (80/20)
     train_size = int(0.8 * len(X_tensor))
     X_train = X_tensor[:train_size]
     y_train = y_tensor[:train_size]
     X_test = X_tensor[train_size:]
     y_test = y_tensor[train_size:]
     
+    # Create DataLoaders
+    from torch.utils.data import TensorDataset, DataLoader
     train_dataset = TensorDataset(X_train, y_train)
     test_dataset = TensorDataset(X_test, y_test)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
     
+    # Train the model and evaluate
     model = train(train_loader, learning_rate, num_epochs, hidden_dim, num_layers, dropout)
     test_loss = evaluate(model, test_loader)
+    
+    # Log the metric (test loss) and end the experiment
+    experiment.log_metric("test_loss", test_loss)
+    experiment.end()
     return test_loss
