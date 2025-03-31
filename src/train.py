@@ -52,6 +52,7 @@ def data_load(filePath):
         'high': 'x4', 
         'low': 'x5'
     }, inplace=True)
+    data.sort_index(inplace=True)
     return data
 
 # --- Data Scaling ---
@@ -186,5 +187,4 @@ def objective(data, learning_rate, batch_size, num_epochs, hidden_dim, num_layer
     
     # Log the metric (test loss) and end the experiment
     experiment.log_metric("test_loss", test_loss)
-    experiment.end()
     return test_loss
