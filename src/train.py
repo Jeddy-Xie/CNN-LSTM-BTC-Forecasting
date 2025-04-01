@@ -106,6 +106,8 @@ def train(train_loader, learning_rate, num_epochs, hidden_dim, num_layers, dropo
     
     model.train()
     for epoch in range(num_epochs):
+        epoch_loss = 0.0
+        total_samples = 0
         for batch_X, batch_y in train_loader:
             batch_X, batch_y = batch_X.to(device), batch_y.to(device)
             optimizer.zero_grad()
@@ -113,6 +115,12 @@ def train(train_loader, learning_rate, num_epochs, hidden_dim, num_layers, dropo
             loss = criterion(outputs, batch_y)
             loss.backward()
             optimizer.step()
+            # Accumulate loss and count samples
+            batch_size = batch_X.size(0)
+            epoch_loss += loss.item() * batch_size
+            total_samples += batch_size
+        epoch_loss /= total_samples
+        print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss:.4f}")
     return model
 
 # --- Evaluation Function ---
