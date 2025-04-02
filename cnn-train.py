@@ -35,7 +35,7 @@ experiment = Experiment(
 
 experiment.log_other("device", device)
 
-btc = data_load(os.path.join(data_dir, 'BTC-USD.csv'))
+btc = data_load(os.path.join(data_dir, 'BTC-USD-small.csv'))
 
 # Hyperparameter Tuning
 # --- Define the hyperparameter bounds ---

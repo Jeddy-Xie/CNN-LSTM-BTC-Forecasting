@@ -5,7 +5,7 @@ import os
 original_data = pd.read_csv('data/processed/BTC-USD.csv')
 
 # Take the first 1000 rows
-small_data = original_data.head(1000)
+small_data = original_data.head(10000)
 
 # Save to the same location
 small_data.to_csv('data/processed/BTC-USD-small.csv', index=False)
